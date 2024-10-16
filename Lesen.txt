@@ -1,0 +1,6 @@
+Erklärung:
+fxmanifest.lua: Definiert die grundlegenden Informationen über das Skript.
+config.lua: Enthält die Konfigurationsdaten wie Angelkoordinaten, Fische, Preise und Wahrscheinlichkeiten.
+client.lua: Steuert das Angeln und den Spielerinput. Es aktiviert das Angeln, wenn der Spieler „E“ drückt, und gibt Fische nach einer gewissen Wartezeit basierend auf der Schwierigkeit.
+server.lua: Handhabt das Fangen und Verkaufen von Fischen auf der Serverseite.
+Dieses Skript bietet dir eine Grundstruktur, die du nach deinen Wünschen weiter anpassen kannst.
