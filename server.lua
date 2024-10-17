@@ -1,36 +1,38 @@
-local playersFish = {}
+ESX = nil
 
--- Server-Event zum Fangen eines Fisches
-RegisterNetEvent('fishing:catch')
-AddEventHandler('fishing:catch', function(fish)
+TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+
+-- Event, um dem Spieler Fische zu geben
+RegisterNetEvent('fishing:giveFish')
+AddEventHandler('fishing:giveFish', function()
     local _source = source
-    if not playersFish[_source] then
-        playersFish[_source] = {}
-    end
+    local xPlayer = ESX.GetPlayerFromId(_source)
 
-    table.insert(playersFish[_source], fish)
-    TriggerClientEvent('chat:addMessage', _source, {
-        args = {"Fishing", "Du hast einen " .. fish .. " gefangen!"}
-    })
+    if xPlayer then
+        -- Bestimme die Anzahl der Fische, die der Spieler erhält
+        local fishCount = math.random(Config.MinFishCount, Config.MaxFishCount)
+
+        -- Gebe dem Spieler zufällige Fische
+        for i = 1, fishCount do
+            local randomFish = getRandomFish()
+            if randomFish then
+                xPlayer.addInventoryItem(randomFish, 1)
+                TriggerClientEvent('esx:showNotification', _source, "Du hast einen " .. randomFish .. " gefangen!")
+            end
+        end
+    end
 end)
 
--- Server-Event zum Verkaufen von Fischen
-RegisterNetEvent('fishing:sell')
-AddEventHandler('fishing:sell', function()
-    local _source = source
-    local fishInventory = playersFish[_source] or {}
-    local totalMoney = 0
+-- Funktion, um einen zufälligen Fisch basierend auf den Wahrscheinlichkeiten zu erhalten
+function getRandomFish()
+    local randomNum = math.random(1, 100)
+    local cumulativeChance = 0
 
-    for _, fish in pairs(fishInventory) do
-        local price = Config.FishPrices[fish] or 0
-        totalMoney = totalMoney + price
+    for _, fish in pairs(Config.FishTypes) do
+        cumulativeChance = cumulativeChance + fish.chance
+        if randomNum <= cumulativeChance then
+            return fish.name
+        end
     end
-
-    playersFish[_source] = {}
-    TriggerClientEvent('chat:addMessage', _source, {
-        args = {"Fishing", "Du hast deine Fische für $" .. totalMoney .. " verkauft!"}
-    })
-
-    -- Hier könntest du einen Befehl hinzufügen, um dem Spieler Geld zu geben
-    -- Beispiel: xPlayer.addMoney(totalMoney)
-end)
+    return nil
+end
